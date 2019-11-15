@@ -621,7 +621,10 @@ uint32_t emsg::write(std::ostream &ostr) const
 {
 	uint32_t bytes_written = 0;
 	uint32_t size = (uint32_t)this->size();
-	ostr.write((char *)&size, 4);
+    ostr.put((size >> 24) & 0xFF);
+    ostr.put((size >> 16) & 0xFF);
+    ostr.put((size >>  8) & 0xFF);
+    ostr.put((size >>  0) & 0xFF);
 	bytes_written += 4;
 	ostr.put('e');
 	ostr.put('m');
