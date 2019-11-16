@@ -733,7 +733,7 @@ void emsg::write_emsg_as_fmp4_fragment(std::ostream &ostr, uint64_t timestamp_tf
 		// --- init trun
 		trun l_trun = {};
 		l_trun.magic_conf_ = 769u;
-		l_trun.sample_count_ = 1;
+		l_trun.sample_count_ = 2;
 		l_trun.data_offset_present_ = true;
 		l_trun.first_sample_flags_present_ =false;
 		l_trun.sample_duration_present_ = true;
@@ -742,14 +742,16 @@ void emsg::write_emsg_as_fmp4_fragment(std::ostream &ostr, uint64_t timestamp_tf
 		l_trun.sample_composition_time_offsets_present_ = false;
 
 		//-- init sentry in trun write 2 samples
-		l_trun.m_sentry.resize(1);
+		l_trun.m_sentry.resize(2);
 		//l_trun.m_sentry[0].sample_size_ = 0;
 		//l_trun.m_sentry[0].sample_duration_ = 0; // presentation_time_delta_ ? this->presentation_time_delta_ : (presentation_time_ - timestamp_tfdt);
 		l_trun.m_sentry[0].sample_size_ = (uint32_t)size();
-		l_trun.m_sentry[0].sample_duration_ = this->event_duration_;    
+		l_trun.m_sentry[0].sample_duration_ = 10;
+        l_trun.m_sentry[1].sample_size_ = 94u;
+        l_trun.m_sentry[1].sample_duration_ = 12u;
 
 
-		//--- initialize the box sizes
+        //--- initialize the box sizes
 		uint64_t l_trun_size = l_trun.size();
 		uint64_t l_traf_size = 8 + l_trun_size + l_tfdt_size + l_tfhd_size;
 		uint64_t l_moof_size = 8 + l_traf_size + l_mfhd_size; // l_traf_size + 8 + l_mfhd_size;
@@ -842,12 +844,12 @@ void emsg::write_emsg_as_fmp4_fragment(std::ostream &ostr, uint64_t timestamp_tf
 		// write the duration and the sample size
 		fmp4_write_uint32((uint32_t)l_trun.m_sentry[0].sample_duration_, int_buf);
 		ostr.write(int_buf, 4);
-		fmp4_write_uint32((uint32_t)l_trun.m_sentry[0].sample_size_, int_buf);
+		fmp4_write_uint32((uint32_t)0, int_buf);
 		ostr.write(int_buf, 4);
-		//fmp4_write_uint32((uint32_t)l_trun.m_sentry[1].sample_duration_, int_buf);
-		//ostr.write(int_buf, 4);
-		//fmp4_write_uint32((uint32_t)l_trun.m_sentry[1].sample_size_, int_buf);
-		//ostr.write(int_buf, 4);
+		fmp4_write_uint32((uint32_t)l_trun.m_sentry[1].sample_duration_, int_buf);
+		ostr.write(int_buf, 4);
+		fmp4_write_uint32((uint32_t)l_trun.m_sentry[1].sample_size_, int_buf);
+		ostr.write(int_buf, 4);
 		//fmp4_write_uint32((uint32_t)l_trun.m_sentry[2].sample_duration_, int_buf);
 		//ostr.write(int_buf, 4);
 		//fmp4_write_uint32((uint32_t)l_trun.m_sentry[2].sample_size_, int_buf);
